@@ -310,28 +310,28 @@ def main():
          st.header("Bantuan❓")
          st.subheader("Bantuan Aplikasi Kompresi Data Dokumen Dan Foto.")
 
-   st.markdown(
-        """
-        <div style="text-align: justify;">
-            Aplikasi ini memungkinkan Anda untuk melakukan kompresi dan dekompresi data teks (dokumen) serta data foto (gambar) secara mudah.
-            <br/><br/>
-            Berikut adalah cara menggunakan setiap fitur:
-            <br/><br/>
-            <strong>1. Kompresi dan Dekompresi Foto (Gambar)</strong><br/>
-            - Untuk melakukan kompresi gambar, unggah file gambar JPEG yang ingin Anda kompresi.<br/>
-            - Pilih kualitas kompresi yang diinginkan menggunakan slider.<br/>
-            - Klik tombol 'Kompres Foto' untuk memulai proses kompresi. Gambar yang telah dikompresi akan ditampilkan dan dapat diunduh.<br/>
-            - Untuk melakukan dekompresi gambar, unggah file gambar JPEG yang telah dikompresi.<br/>
-            - Klik tombol 'Dekompresi Foto' untuk mendapatkan gambar asli kembali.<br/><br/>
-            <strong>2. Kompresi dan Dekompresi Dokumen (PDF)</strong><br/>
-            - Untuk melakukan kompresi dokumen PDF, unggah file dokumen PDF yang ingin Anda kompresi.<br/>
-            - Pilih kualitas kompresi gambar dalam dokumen menggunakan slider.<br/>
-            - Klik tombol 'Kompres Dokumen' untuk memulai proses kompresi. Dokumen yang telah dikompresi akan ditampilkan dan dapat diunduh.<br/>
-            - Untuk melakukan dekompresi dokumen PDF, unggah file dokumen PDF yang telah dikompresi.<br/>
-            - Klik tombol 'Dekompresi Dokumen' untuk mendapatkan dokumen asli kembali.<br/>
-        </div>
-        """,
-        unsafe_allow_html=True
-     )
+        st.markdown(
+            """
+            <div style="text-align: justify;">
+                Aplikasi ini memungkinkan Anda untuk melakukan kompresi dan dekompresi data teks (dokumen) serta data foto (gambar) secara mudah.
+                <br/><br/>
+                Berikut adalah cara menggunakan setiap fitur:
+                <br/><br/>
+                <strong>1. Kompresi dan Dekompresi Foto (Gambar)</strong><br/>
+                - Untuk melakukan kompresi gambar, unggah file gambar JPEG yang ingin Anda kompresi.<br/>
+                - Pilih kualitas kompresi yang diinginkan menggunakan slider.<br/>
+                - Klik tombol 'Kompres Foto' untuk memulai proses kompresi. Gambar yang telah dikompresi akan ditampilkan dan dapat diunduh.<br/>
+                - Untuk melakukan dekompresi gambar, unggah file gambar JPEG yang telah dikompresi.<br/>
+                - Klik tombol 'Dekompresi Foto' untuk mendapatkan gambar asli kembali.<br/><br/>
+                <strong>2. Kompresi dan Dekompresi Dokumen (PDF)</strong><br/>
+                - Untuk melakukan kompresi dokumen PDF, unggah file dokumen PDF yang ingin Anda kompresi.<br/>
+                - Pilih kualitas kompresi gambar dalam dokumen menggunakan slider.<br/>
+                - Klik tombol 'Kompres Dokumen' untuk memulai proses kompresi. Dokumen yang telah dikompresi akan ditampilkan dan dapat diunduh.<br/>
+                - Untuk melakukan dekompresi dokumen PDF, unggah file dokumen PDF yang telah dikompresi.<br/>
+                - Klik tombol 'Dekompresi Dokumen' untuk mendapatkan dokumen asli kembali.<br/>
+            </div>
+            """,
+            unsafe_allow_html=True
+         )
 if __name__ == "__main__":
     main()
