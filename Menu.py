@@ -13,6 +13,17 @@ custom_css = """
     [data-testid="stSidebar"] {
         background-color: #999DA0;
     }
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+    transition: transform 0.3s ease-in-out;
+    }
+
+    /* Sidebar styling for mobile */
+    @media (max-width: 768px) {
+    [data-testid="stSidebar"][aria-expanded="false"] {
+        transform: translateX(-100%);
+    }
+    }
     @media only screen and (max-width: 768px) {
     [data-testid="stSidebar"][aria-expanded="false"] {
         transform: translateX(0px);
