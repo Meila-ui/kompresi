@@ -1,0 +1,4 @@
+streamlit
+Pillow
+PyMuPDF
+streamlit_option_menu
