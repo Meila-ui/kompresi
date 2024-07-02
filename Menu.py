@@ -19,9 +19,8 @@ custom_css = """
         color: #FFFFFF;  /* Mengubah warna teks menjadi putih */
     }
     /* Mengubah warna tombol */
-    .stButton>button {
-        background-color: #B3DED1;
-        color: Blue;
+    if st.button("Klik di sini untuk Mengunduh Dokumen yang Didekompresi"):
+    st.download_button(label="Download Dokumen yang Didekompresi", data=decompressed_pdf, file_name="decompressed_document.pdf", mime="application/pdf")
     }
     </style>
     """
