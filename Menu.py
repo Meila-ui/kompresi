@@ -306,6 +306,9 @@ def main():
         uploaded_file = st.file_uploader("Pilih file dokumen PDF untuk didekompresi", type=["pdf"])
         if uploaded_file is not None:
             decompress_document(uploaded_file)
+    elif selected == "Bantuan":
+         st.header("Bantuan❓")
+         st.subheader("Bantuan Aplikasi Kompresi Data Dokumen Dan Foto.")
 
    st.markdown(
         """
