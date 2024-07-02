@@ -13,6 +13,10 @@ custom_css = """
     [data-testid="stSidebar"] {
         background-color: #999DA0;
     }
+    @media only screen and (max-width: 768px) {
+    [data-testid="stSidebar"][aria-expanded="false"] {
+        transform: translateX(0px);
+    }
     /* Mengubah background halaman utama */
     .css-1d391kg {
         background-color: #006666;
