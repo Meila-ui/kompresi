@@ -11,7 +11,7 @@ custom_css = """
     <style>
     /* Mengubah background sidebar */
     [data-testid="stSidebar"] {
-        background-color: #999DA0;
+        background-color: #8A9A5B;
     }
     /* Sidebar styling */
     [data-testid="stSidebar"] {
