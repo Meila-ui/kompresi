@@ -259,7 +259,7 @@ def main():
         """
         <style>
             .main {
-                background-color: #B9BBB6;
+                background-color: #87A96B
                 padding: 20px;
                 border-radius: 15px;
             }
