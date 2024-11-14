@@ -11,7 +11,7 @@ custom_css = """
     <style>
     /* Mengubah background sidebar */
     [data-testid="stSidebar"] {
-        background-color: #8A9A5B;
+        background-color: #849A5B;
     }
     /* Sidebar styling */
     [data-testid="stSidebar"] {
@@ -259,7 +259,7 @@ def main():
         """
         <style>
             .main {
-                background-color: #87A96B
+                background-color: #D0F0C0
                 padding: 20px;
                 border-radius: 15px;
             }
