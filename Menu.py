@@ -33,6 +33,7 @@ custom_css = """
         background-color: #006666;
         color: #FFFFFF;  /* Mengubah warna teks menjadi putih */
     }
+
     /* Mengubah warna tombol */
     if st.button("Klik di sini untuk Mengunduh Dokumen yang Didekompresi"):
     st.download_button(label="Download Dokumen yang Didekompresi", data=decompressed_pdf, file_name="decompressed_document.pdf", mime="application/pdf")
@@ -259,13 +260,9 @@ def main():
         """
         <style>
             .main {
-                background-color: #B9D180;
+                background-color: #b9d180;
                 padding: 20px;
                 border-radius: 15px;
-            }
-            .stButton>button {
-                background-color: #B3DED1;
-                color: Blue;
             }
         </style>
         """,
