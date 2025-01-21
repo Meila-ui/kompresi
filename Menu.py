@@ -272,6 +272,7 @@ def main():
     if selected == "Dashboard":
         st.header("Selamat Datang di Website Kompresi Dokumen Dan Gambar")
         st.write("Silahkan Pilih Menu Yang Tersedia Pada Sidebar.")
+        st.write("Jika Anda Menggunakan Smartphone, Klik Tanda Panah Yang Berada Pada Pojok Kiri Atas")
         st.write("Berikut adalah fitur yang tersedia:")
         st.write("- Kompresi Gambar🖼️")
         st.write("- Dekompresi Gambar🖼️")
