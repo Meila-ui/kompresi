@@ -6,12 +6,12 @@ import io
 import fitz
 from streamlit_option_menu import option_menu
 
-# Custom CSS for styling
+# CSS khusus untuk penataan gaya
 custom_css = """
     <style>
     /* Mengubah background sidebar */
     [data-testid="stSidebar"] {
-        background-color: #849A5B;
+        background-color:rgb(132, 172, 95);
     }
     /* Sidebar styling */
     [data-testid="stSidebar"] {
@@ -28,12 +28,7 @@ custom_css = """
     [data-testid="stSidebar"][aria-expanded="false"] {
         transform: translateX(0px);
     }
-    /* Mengubah background halaman utama */
-    .css-1d391kg {
-        background-color: #006666;
-        color: #FFFFFF;  /* Mengubah warna teks menjadi putih */
-    }
-
+    
     /* Mengubah warna tombol */
     if st.button("Klik di sini untuk Mengunduh Dokumen yang Didekompresi"):
     st.download_button(label="Download Dokumen yang Didekompresi", data=decompressed_pdf, file_name="decompressed_document.pdf", mime="application/pdf")
@@ -44,7 +39,7 @@ custom_css = """
 # Menggunakan custom CSS di dalam Streamlit
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Define Node class for Huffman coding
+# Menentukan kelas Node untuk pengkodean Huffman
 class Node:
     def __init__(self, freq, char=None, left=None, right=None):
         self.freq = freq
@@ -55,7 +50,7 @@ class Node:
     def __lt__(self, other):
         return self.freq < other.freq
 
-# Build Huffman Tree
+# Membangun Pohon Huffman
 def build_huffman_tree(data):
     if not data:
         return None
@@ -72,7 +67,7 @@ def build_huffman_tree(data):
 
     return priority_queue[0]
 
-# Build Huffman Codes
+# Membuat Kode Huffman
 def build_codes(node, prefix='', codebook=None):
     if codebook is None:
         codebook = {}
@@ -86,14 +81,14 @@ def build_codes(node, prefix='', codebook=None):
 
     return codebook
 
-# Huffman Compression
+# Kompresi Huffman
 def huffman_compress(data):
     tree = build_huffman_tree(data)
     codebook = build_codes(tree)
     compressed_data = ''.join(codebook[char] for char in data)
     return compressed_data, tree, codebook
 
-# Huffman Decompression
+# Dekompresi Huffman
 def huffman_decompress(compressed_data, tree):
     result = []
     node = tree
@@ -104,7 +99,7 @@ def huffman_decompress(compressed_data, tree):
             node = tree
     return bytes(result)
 
-# Image Compression
+# Kompresi Gambar
 def compress_image(uploaded_file):
     try:
         if uploaded_file.type != "image/jpeg":
@@ -122,13 +117,13 @@ def compress_image(uploaded_file):
 
         st.success(f"Gambar berhasil dikompresi! Rasio kompresi: {ratio:.2%}")
 
-        # Download button
+        # Tombol unduh
         st.download_button(label="Download Gambar yang Dikompresi", data=compressed_image_data, file_name="compressed_image.jpeg")
 
     except Exception as e:
         st.error(f"Terjadi kesalahan saat mengompresi gambar: {e}")
 
-# Image Decompression
+# Dekompresi Gambar
 def decompress_image(uploaded_file):
     try:
         # Membaca data gambar yang diunggah
@@ -151,51 +146,51 @@ def decompress_image(uploaded_file):
         st.error(f"Terjadi kesalahan saat mendekompresi gambar: {e}")
 
 
-# Function to compress PDF document
+# Berfungsi untuk mengompres dokumen PDF
 def compress_document(uploaded_file):
     try:
         pdf_document = uploaded_file.read()
         original_size = len(pdf_document)
 
-        # Quality selection for image compression
+        # Pemilihan kualitas untuk kompresi gambar
         quality = st.slider("Pilih Kualitas Kompresi Gambar Dalam Dokumen (semakin rendah semakin terkompresi)", 1, 100, 50)
 
-        # Initialize PDF reader
+        # Inisialisasi pembaca PDF
         pdf_reader = fitz.open(stream=pdf_document, filetype="pdf")
 
-        # Initialize PDF writer for compressed output
+        # Inisialisasi penulis PDF untuk keluaran terkompresi
         pdf_writer = fitz.open()
 
         for page_number in range(pdf_reader.page_count):
             page = pdf_reader.load_page(page_number)
 
-            # Get images in the page
+            # Dapatkan gambar di halaman
             image_list = page.get_images(full=True)
             for img_index, img in enumerate(image_list):
                 xref = img[0]
                 base_image = pdf_reader.extract_image(xref)
                 image_bytes = base_image["image"]
 
-                # Compress the image
+                # Kompres gambar
                 img_buf = io.BytesIO(image_bytes)
                 image = Image.open(img_buf)
                 
-                # Convert image to JPEG with specified quality
+                #Konversi gambar ke JPEG dengan kualitas tertentu
                 img_buf = io.BytesIO()
                 image.save(img_buf, format="JPEG", quality=quality)
                 compressed_image_bytes = img_buf.getvalue()
 
-                # Replace the image in the page
+                # Ganti gambar di halaman
                 rect = page.get_image_rects(xref)[0]
                 page.insert_image(rect, stream=compressed_image_bytes)
 
-            # Insert the processed page into the writer
+            # Masukkan halaman yang diproses ke dalam penulis
             pdf_writer.insert_pdf(pdf_reader, from_page=page_number, to_page=page_number)
 
-        # Optimize the PDF by compressing images and fonts
+        # Optimalkan PDF dengan mengompresi gambar dan font
         pdf_writer.save("compressed.pdf", garbage=4, deflate=True, clean=True, linear=True)
 
-        # Read the compressed PDF back
+        # Baca kembali PDF terkompresi
         with open("compressed.pdf", "rb") as f:
             compressed_pdf = f.read()
 
@@ -208,8 +203,7 @@ def compress_document(uploaded_file):
 
     except Exception as e:
         st.error(f"Terjadi kesalahan saat mengompresi dokumen: {e}")
-
-# Streamlit interface
+# Antarmuka yang disederhanakan
 def main():
     st.title("PDF Document Compression")
 
@@ -217,25 +211,26 @@ def main():
 
     if uploaded_file is not None:
         compress_document(uploaded_file)
-# Document Decompression
+        
+# Dekompresi dokumen
 def decompress_document(uploaded_file):
     try:
         compressed_pdf = uploaded_file.read()
 
         pdf_reader = fitz.open(stream=compressed_pdf)
 
-        # Create a new PDF to store the decompressed content
+        # Buat PDF baru untuk menyimpan konten yang didekompresi
         pdf_writer = fitz.open()
 
         for page_number in range(pdf_reader.page_count):
             page = pdf_reader.load_page(page_number)
             pdf_writer.insert_pdf(pdf_reader, from_page=page_number, to_page=page_number)
 
-        # Save the decompressed PDF
+        # Simpan PDF yang telah didekompresi
         decompressed_pdf_path = "decompressed.pdf"
         pdf_writer.save(decompressed_pdf_path, garbage=4, deflate=True, clean=True, linear=True)
 
-        # Read the decompressed PDF
+        # Baca PDF yang didekompresi
         with open(decompressed_pdf_path, "rb") as f:
             decompressed_pdf = f.read()
 
@@ -260,7 +255,7 @@ def main():
         """
         <style>
             .main {
-                background-color: #b9d180;
+                background-color:rgb(150, 189, 109);
                 padding: 20px;
                 border-radius: 15px;
             }
@@ -271,7 +266,7 @@ def main():
 
     if selected == "Dashboard":
         st.header("Selamat Datang di Website Kompresi Dokumen Dan Gambar")
-        st.write("Silahkan Pilih Menu Yang Tersedia Pada Sidebar.")
+        st.write("Silahkan Pilih Menu Yang Tersedia Pada Sidebar")
         st.write("Jika Anda Menggunakan Smartphone, Klik Tanda Panah Yang Berada Pada Pojok Kiri Atas")
         st.write("Berikut adalah fitur yang tersedia:")
         st.write("- Kompresi Gambar🖼️")
@@ -282,13 +277,13 @@ def main():
         
     
     elif selected == "Kompresi Gambar":
-        st.title("Kompresi Gambar JPEG dan JPG")
+        st.title("Kompresi Gambar JPEG/JPG")
         uploaded_file = st.file_uploader("Pilih file gambar JPEG untuk dikompresi", type=["jpeg", "jpg"])
         if uploaded_file is not None:
             compress_image(uploaded_file)
 
     elif selected == "Dekompresi Gambar":
-        st.title("Dekompresi Gambar JPEG dan JPG")
+        st.title("Dekompresi Gambar JPEG/JPG")
         uploaded_file = st.file_uploader("Pilih file gambar JPEG untuk didekompresi", type=["jpeg", "jpg"])
         if uploaded_file is not None:
             decompress_image(uploaded_file)
