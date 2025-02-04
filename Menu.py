@@ -8,17 +8,16 @@ from streamlit_option_menu import option_menu
 
 # CSS khusus untuk penataan gaya
 custom_css = """
-    <style>
+<style>
     /* Mengubah background sidebar */
     [data-testid="stSidebar"] {
-        background-color:rgb(132, 172, 95);
+        background-color:rgb(122, 151, 92);
     }
     /* Sidebar styling */
     [data-testid="stSidebar"] {
     transition: transform 0.3s ease-in-out;
     }
-
-    /* Sidebar styling for mobile */
+     /* Sidebar styling for mobile */
     @media (max-width: 768px) {
     [data-testid="stSidebar"][aria-expanded="false"] {
         transform: translateX(-100%);
@@ -115,7 +114,7 @@ def compress_image(uploaded_file):
         compressed_size = len(compressed_image_data)
         ratio = compressed_size / original_size
 
-        st.success(f"Gambar berhasil dikompresi! Rasio kompresi: {ratio:.2%}")
+        st.success(f"Gambar berhasil dikompresi! Ukuran asli: {original_size} bytes, Ukuran setelah kompresi: {compressed_size} bytes")
 
         # Tombol unduh
         st.download_button(label="Download Gambar yang Dikompresi", data=compressed_image_data, file_name="compressed_image.jpeg")
@@ -152,9 +151,6 @@ def compress_document(uploaded_file):
         pdf_document = uploaded_file.read()
         original_size = len(pdf_document)
 
-        # Pemilihan kualitas untuk kompresi gambar
-        quality = st.slider("Pilih Kualitas Kompresi Gambar Dalam Dokumen (semakin rendah semakin terkompresi)", 1, 100, 50)
-
         # Inisialisasi pembaca PDF
         pdf_reader = fitz.open(stream=pdf_document, filetype="pdf")
 
@@ -177,7 +173,7 @@ def compress_document(uploaded_file):
                 
                 #Konversi gambar ke JPEG dengan kualitas tertentu
                 img_buf = io.BytesIO()
-                image.save(img_buf, format="JPEG", quality=quality)
+                image.save(img_buf, format="JPEG")
                 compressed_image_bytes = img_buf.getvalue()
 
                 # Ganti gambar di halaman
@@ -197,7 +193,7 @@ def compress_document(uploaded_file):
         compressed_size = len(compressed_pdf)
         ratio = compressed_size / original_size if original_size > 0 else 0
 
-        st.success(f"Dokumen berhasil dikompresi! Ukuran asli: {original_size} bytes, Ukuran setelah kompresi: {compressed_size} bytes, Rasio kompresi: {ratio:.2%}")
+        st.success(f"Dokumen berhasil dikompresi! Ukuran asli: {original_size} bytes, Ukuran setelah kompresi: {compressed_size} bytes")
 
         st.download_button(label="Download Dokumen yang Dikompresi", data=compressed_pdf, file_name="compressed_document.pdf", mime="application/pdf")
 
@@ -255,7 +251,7 @@ def main():
         """
         <style>
             .main {
-                background-color:rgb(150, 189, 109);
+                background-color:rgb(185, 221, 146);
                 padding: 20px;
                 border-radius: 15px;
             }
