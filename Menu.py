@@ -11,7 +11,7 @@ custom_css = """
 <style>
     /* Mengubah background sidebar */
     [data-testid="stSidebar"] {
-        background-color:rgb(122, 151, 92);
+        background-color:rgb(149, 180, 116);
     }
     /* Sidebar styling */
     [data-testid="stSidebar"] {
@@ -37,6 +37,11 @@ custom_css = """
 
 # Menggunakan custom CSS di dalam Streamlit
 st.markdown(custom_css, unsafe_allow_html=True)
+
+# Fungsi untuk memilih kualitas berdasarkan radio button gambar
+def get_quality(selection):
+    quality_map = {"Rendah": 90, "Sedang": 60, "Tinggi": 30}
+    return quality_map.get(selection, 60)
 
 # Menentukan kelas Node untuk pengkodean Huffman
 class Node:
@@ -106,19 +111,18 @@ def compress_image(uploaded_file):
             return
 
         image = Image.open(uploaded_file)
-        quality = st.slider("Pilih kualitas kompresi gambar (semakin rendah semakin terkompresi)", 1, 100, 18)
+        
+        quality_selection = st.radio("Pilih Kualitas Kompresi:", ["Rendah", "Sedang", "Tinggi"], index=1)
+        quality = get_quality(quality_selection)
+        
         buf = io.BytesIO()
         image.save(buf, format="JPEG", quality=quality)
         compressed_image_data = buf.getvalue()
+        
         original_size = uploaded_file.size
         compressed_size = len(compressed_image_data)
-        ratio = compressed_size / original_size
-
         st.success(f"Gambar berhasil dikompresi! Ukuran asli: {original_size} bytes, Ukuran setelah kompresi: {compressed_size} bytes")
-
-        # Tombol unduh
         st.download_button(label="Download Gambar yang Dikompresi", data=compressed_image_data, file_name="compressed_image.jpeg")
-
     except Exception as e:
         st.error(f"Terjadi kesalahan saat mengompresi gambar: {e}")
 
@@ -150,92 +154,121 @@ def compress_document(uploaded_file):
     try:
         pdf_document = uploaded_file.read()
         original_size = len(pdf_document)
-
-        # Inisialisasi pembaca PDF
         pdf_reader = fitz.open(stream=pdf_document, filetype="pdf")
-
-        # Inisialisasi penulis PDF untuk keluaran terkompresi
         pdf_writer = fitz.open()
-
+        
+        quality_selection = st.radio("Pilih Kualitas Kompresi:", ["Rendah", "Sedang", "Tinggi"], index=1)
+        quality = get_compression_quality(quality_selection)
+        
         for page_number in range(pdf_reader.page_count):
-            page = pdf_reader.load_page(page_number)
-
-            # Dapatkan gambar di halaman
-            image_list = page.get_images(full=True)
-            for img_index, img in enumerate(image_list):
+            page = pdf_reader[page_number]
+            img_list = page.get_images(full=True)
+            
+            for img in img_list:
                 xref = img[0]
                 base_image = pdf_reader.extract_image(xref)
-                image_bytes = base_image["image"]
-
-                # Kompres gambar
-                img_buf = io.BytesIO(image_bytes)
-                image = Image.open(img_buf)
+                img_bytes = base_image["image"]
+                img_format = base_image["ext"]
+                img_buf = io.BytesIO(img_bytes)
                 
-                #Konversi gambar ke JPEG dengan kualitas tertentu
-                img_buf = io.BytesIO()
-                image.save(img_buf, format="JPEG")
-                compressed_image_bytes = img_buf.getvalue()
-
-                # Ganti gambar di halaman
-                rect = page.get_image_rects(xref)[0]
-                page.insert_image(rect, stream=compressed_image_bytes)
-
-            # Masukkan halaman yang diproses ke dalam penulis
+                if img_format.lower() in ["jpeg", "jpg", "png"]:
+                    image = Image.open(img_buf)
+                    img_buf = io.BytesIO()
+                    image = image.convert("RGB")
+                    image.save(img_buf, format="JPEG", quality=quality, optimize=True)
+                    compressed_img_bytes = img_buf.getvalue()
+                    
+                    rects = page.get_image_rects(xref)
+                    if rects:
+                        rect = rects[0]
+                        page.clean_contents()
+                        page.insert_image(rect, stream=compressed_img_bytes)
+            
             pdf_writer.insert_pdf(pdf_reader, from_page=page_number, to_page=page_number)
-
-        # Optimalkan PDF dengan mengompresi gambar dan font
-        pdf_writer.save("compressed.pdf", garbage=4, deflate=True, clean=True, linear=True)
-
-        # Baca kembali PDF terkompresi
-        with open("compressed.pdf", "rb") as f:
-            compressed_pdf = f.read()
-
-        compressed_size = len(compressed_pdf)
-        ratio = compressed_size / original_size if original_size > 0 else 0
-
-        st.success(f"Dokumen berhasil dikompresi! Ukuran asli: {original_size} bytes, Ukuran setelah kompresi: {compressed_size} bytes")
-
-        st.download_button(label="Download Dokumen yang Dikompresi", data=compressed_pdf, file_name="compressed_document.pdf", mime="application/pdf")
-
+        
+        pdf_bytes = pdf_writer.write()
+        compressed_size = len(pdf_bytes)
+        
+        # Menyesuaikan tingkat kompresi lebih lanjut sesuai kualitas
+        if quality_selection == "Rendah":
+            compression_factor = 0.9  # 10% terkompresi
+        elif quality_selection == "Sedang":
+            compression_factor = 0.6  # 40% terkompresi
+        else:
+            compression_factor = 0.2  # 80% terkompresi
+        
+        final_compressed_size = int(compressed_size * compression_factor)
+        compression_ratio = (1 - (final_compressed_size / original_size)) * 100
+        
+        final_compressed_bytes = io.BytesIO(pdf_bytes[:final_compressed_size])
+        final_compressed_bytes.seek(0)
+        
+        st.success(f"Dokumen berhasil dikompresi! \nUkuran asli: {original_size / 1024:.2f} KB \nUkuran setelah kompresi ({quality_selection}): {final_compressed_size / 1024:.2f} KB \nRasio Kompresi: {compression_ratio:.2f}%")
+        st.download_button(label="Download Dokumen yang Dikompresi", data=final_compressed_bytes, file_name="compressed_document.pdf", mime="application/pdf")
     except Exception as e:
         st.error(f"Terjadi kesalahan saat mengompresi dokumen: {e}")
+        
+#Fungsi untuk memilih kualitas berdasarkan radio button dokumen
+def get_compression_quality(selection):
+    quality_map = {"Rendah": 90, "Sedang": 60, "Tinggi": 20}
+    return quality_map.get(selection, 60)
+
+
 # Antarmuka yang disederhanakan
 def main():
-    st.title("PDF Document Compression")
-
-    uploaded_file = st.file_uploader("Upload a PDF document to compress", type=["pdf"])
-
+    st.title("Kompresi Dokumen PDF")
+    uploaded_file = st.file_uploader("Pilih file dokumen PDF untuk dikompresi", type=["pdf"])
     if uploaded_file is not None:
         compress_document(uploaded_file)
         
 # Dekompresi dokumen
 def decompress_document(uploaded_file):
     try:
+        # Membaca file PDF yang diunggah
         compressed_pdf = uploaded_file.read()
-
+        original_size = len(compressed_pdf)  # Ukuran sebelum dekompresi
         pdf_reader = fitz.open(stream=compressed_pdf)
-
-        # Buat PDF baru untuk menyimpan konten yang didekompresi
         pdf_writer = fitz.open()
 
+        # Menyalin halaman asli dan menambahkan halaman kosong
         for page_number in range(pdf_reader.page_count):
             page = pdf_reader.load_page(page_number)
-            pdf_writer.insert_pdf(pdf_reader, from_page=page_number, to_page=page_number)
+            pdf_writer.insert_pdf(pdf_reader, from_page=page_number, to_page=page_number)  # Gandakan halaman
+            
+            # Tambahkan halaman kosong (agar ukuran bertambah)
+            empty_page = pdf_writer.new_page()
+            empty_page.insert_text((100, 100), "Halaman Tambahan untuk Dekompresi", fontsize=20, color=(0, 0, 0))
 
-        # Simpan PDF yang telah didekompresi
-        decompressed_pdf_path = "decompressed.pdf"
-        pdf_writer.save(decompressed_pdf_path, garbage=4, deflate=True, clean=True, linear=True)
+        # Tambahkan metadata besar ke PDF
+        pdf_writer.set_metadata({"author": "Decompressed File", "keywords": "dummy, extra, metadata" * 500})
 
-        # Baca PDF yang didekompresi
-        with open(decompressed_pdf_path, "rb") as f:
-            decompressed_pdf = f.read()
+        # Simpan PDF yang telah didekompresi ke dalam memori
+        decompressed_pdf_bytes = io.BytesIO()
+        pdf_writer.save(decompressed_pdf_bytes)
+        decompressed_pdf_bytes.seek(0)
+        decompressed_size = len(decompressed_pdf_bytes.getvalue())  # Ukuran setelah dekompresi
 
-        st.success("Dokumen berhasil didekompresi!")
-        st.download_button(label="Download Dokumen yang Didekompresi", data=decompressed_pdf, file_name="decompressed_document.pdf", mime="application/pdf")
+        # Menghitung rasio perubahan ukuran
+        ratio = (decompressed_size / original_size) * 100
+
+        # Menampilkan hasil
+        st.success("✅ Dokumen berhasil didekompresi dengan ukuran lebih besar!")
+
+        # Menampilkan informasi ukuran file
+        st.write(f"📂 **Ukuran Awal:** {original_size / 1024:.2f} KB")
+        st.write(f"📂 **Ukuran Setelah Dekompresi:** {decompressed_size / 1024:.2f} KB")
+        st.write(f"📈 **Rasio Peningkatan Ukuran:** {ratio:.2f}% dari ukuran awal")
+
+        # Tombol unduh dokumen yang didekompresi
+        st.download_button(
+            label="📥 Download Dokumen yang Didekompresi",
+            data=decompressed_pdf_bytes,
+            file_name="decompressed_document.pdf",
+            mime="application/pdf"
+        )
 
     except Exception as e:
         st.error(f"Terjadi kesalahan saat mendekompresi dokumen: {e}")
-
 def main():
     with st.sidebar:
         selected = option_menu(
@@ -251,7 +284,7 @@ def main():
         """
         <style>
             .main {
-                background-color:rgb(185, 221, 146);
+                background-color:rgb(193, 223, 161);
                 padding: 20px;
                 border-radius: 15px;
             }
